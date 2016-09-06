@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#125688</color>
+    <color name="colorPrimaryDark">#125688</color>
+    <color name="textColorPrimary">#FFFFFF</color>
+    <color name="windowBackground">#FFFFFF</color>
+    <color name="navigationBarColor">#000000</color>
+    <color name="colorAccent">#c8e8ff</color>
+    <color name="translucent_black">#80000000</color>
+    C90707
+    <color name="translucent_red">#C0C90707</color>
+    <color name="black">#000</color>
+    <color name="orange">#FA0</color>
+    <color name="white">#FFF</color>
+
+    <color name="sky_orange">#FFC733</color>
+    <color name="dark_orange">#FF7A33</color>
+    <color name="lite_orange">#FFE633</color>
+    <color name="sky_blue">#71B6F9</color>
+    <color name="dark_blue">#222222</color>
+    <color name="lite_dark_blue">#004F81</color>
+</resources>
