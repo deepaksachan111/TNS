@@ -8,6 +8,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.internal.view.ContextThemeWrapper;
@@ -39,32 +40,51 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import deepak.tns.font.CustomFont;
 
 public class RegisterActivity extends AppCompatActivity {
     private String responce;
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private static   String device_id ;
+
+    long total =0;
+    int count;
+    int length;
+    private ProgressDialog pDialog;
+
+    Handler handler;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-        Typeface typeface = Typeface.createFromAsset(getAssets(), "OstrichSans-Heavy.otf");
+       // Typeface typeface = Typeface.createFromAsset(getAssets(), "OstrichSans-Heavy.otf");
         TextView tx = (TextView) findViewById(R.id.text_name);
-        tx.setTypeface(typeface);
+
+
+        tx.setTypeface(CustomFont.setTypeface(this));
+
         // tx.setEllipsize(TextUtils.TruncateAt.MARQUEE);
         // tx.setSelected(true);
         // tx.setSingleLine(true);
-        sharedPreferences = getSharedPreferences("MY",0);
+        sharedPreferences = getSharedPreferences("MY", 0);
         editor = sharedPreferences.edit();
 
-
+        handler = new Handler();
         TextView tv = (TextView) findViewById(R.id.text_welcome);
         Typeface typeface2 = Typeface.createFromAsset(getAssets(), "OstrichSans-Bold.otf");
         tv.setTypeface(typeface2);
@@ -72,13 +92,36 @@ public class RegisterActivity extends AppCompatActivity {
         TelephonyManager tm = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
         device_id = tm.getDeviceId();
 
-
+    /*    Intent intent=new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse("http://www.javatpoint.com"));
+        startActivity(intent);*/
         findViewById(R.id.button_register).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Toast.makeText(RegisterActivity.this, "IME No. :  " + device_id, Toast.LENGTH_LONG).show();
                 registerUserGet("http://tnssofts.com/apiservices/ReqService.svc/CheckIMEI/" + device_id);
+             /*   progressupadte();
+             new Thread(){
+                 final String url = "https://i.ytimg.com/vi/AnnsFB_iY-A/maxresdefault.jpg";
+                 final String URL =
+                         "http://www.freedigitalphotos.net/images/img/homepage/87357.jpg";
+                 final String URL1 =
+                         "http://assets.barcroftmedia.com.s3-website-eu-west-1.amazonaws.com/assets/images/recent-images-11.jpg";
+                 final String URL2 =
+                         "http://theopentutorials.com/wp-content/themes/theopentutorials/images/open_tutorials_logo_v4.png";
+
+                 final String urssddfsefw[] = new String[]{
+                         url,URL,URL1,URL2
+                 };
+
+                 public void run(){
+
+                     getDataVolley(urssddfsefw);
+
+                 }
+             }.start();*/
+
 
 
             }
@@ -88,6 +131,8 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     }
+
+
 
 
     private void registerUserGet(String REGISTER_URL) {
@@ -159,7 +204,9 @@ public class RegisterActivity extends AppCompatActivity {
                     public void onErrorResponse(VolleyError error) {
                         Toast.makeText(RegisterActivity.this,"Internet is not working or please check your internet connection ", Toast.LENGTH_LONG).show();
                     }
-                });
+
+
+        });
 
         RequestQueue requestQueue = Volley.newRequestQueue(this);
         requestQueue.add(stringRequest);
@@ -230,7 +277,7 @@ public class RegisterActivity extends AppCompatActivity {
         //making POST request.
         try {
             httpResponse = httpClient.execute(httpPost);
-            HttpEntity httpEntity = httpResponse.getEntity();
+          HttpEntity httpEntity = httpResponse.getEntity();
             responce = EntityUtils.toString(httpEntity);
             // write response to log
             Log.d("Http Post Response:", responce.toString());
@@ -349,4 +396,67 @@ public class RegisterActivity extends AppCompatActivity {
         }
     }
 
+
+    private void getDataVolley(String[] Urls) {
+       int i = 0;
+        for (String uuu : Urls) {
+            downloadImage(uuu,i);
+            i++;
+        }
+    }
+
+
+    private void downloadImage(String sssss,int pos){
+
+        try {
+            URL url = new URL(sssss);
+            URLConnection urlConnection = url.openConnection();
+            urlConnection.connect();
+            length = urlConnection.getContentLength();
+            OutputStream outputStream = new FileOutputStream("/sdcard/"+ pos+"hhh.jpg");
+            InputStream inputStream = new java.net.URL(sssss).openStream();
+          //  InputStream inputStreamBufferd = new BufferedInputStream(url.openStream());
+           // Picasso.with(this).load( "/mqdefault.jpg").placeholder(R.mipmap.tnslogo).error().resize(240, 150).into(viewholder.imageView);
+            byte data[] = new byte[1024];
+
+
+
+            while ((count = inputStream.read(data))!= -1){
+                total += count;
+                outputStream.write(data, 0, count);
+
+                RegisterActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        String s = ("" + (int) ((total * 100) / length));
+                        pDialog.setProgress(Integer.parseInt(s));
+                    }
+                });
+            }
+            pDialog.dismiss();
+            outputStream.flush();
+            outputStream.close();
+            inputStream.close();
+
+
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+    }
+
+    private void progressupadte(){
+        pDialog = new ProgressDialog(RegisterActivity.this);
+        pDialog.setMessage("Downloading file. Please wait...");
+        pDialog.setIndeterminate(false);
+        pDialog.setMax(100);
+        pDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+        pDialog.setCancelable(true);
+        pDialog.show();
+    }
 }

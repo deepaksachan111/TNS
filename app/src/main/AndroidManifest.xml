@@ -3,11 +3,15 @@
     package="deepak.tns" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
     <uses-permission android:name="ANDROID.PERMISSION.WRITE_EXTERNAL_STORAGE"/>
 
-    <application
+
+
+    <application 
+
         android:allowBackup="true"
         android:icon="@mipmap/tnslogo"
         android:label="@string/app_name"
@@ -27,6 +31,7 @@
             android:theme="@style/MyMaterialTheme.Base" >
         </activity>
         <activity
+
             android:theme="@style/MyMaterialTheme.Base"
             android:name=".SiteInformationActivity"
             android:label="@string/title_activity_site_information" >

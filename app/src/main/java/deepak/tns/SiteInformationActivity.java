@@ -10,6 +10,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.SparseBooleanArray;
@@ -31,6 +32,8 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.squareup.otto.Bus;
+import com.squareup.otto.ThreadEnforcer;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +47,8 @@ public class SiteInformationActivity extends ListActivity {
 
     private    ProgressDialog pd;
   private  int PICK_IMAGE_REQUEST= 1;
+
+    ArrayList<Daats> dadaDaatses = new ArrayList<>();
 
   //  String []name ={"Noida","Lucknow","Kanpur","Allahabad","Delhi","Panjab","Bangalore"};
     //  ArrayList<String> listname = (ArrayList<String>) Arrays.asList(name);
@@ -63,6 +68,11 @@ private TextView site_check_internet ;
     /** Declaring an ArrayAdapter to set items to ListView */
     ArrayAdapter adapter;
    private ListView listView;
+
+    String sitename;
+   public static Bus BUS ;
+    Handler handler = new Handler();
+
     /** Called when the activity is first created. */
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,6 +87,10 @@ private TextView site_check_internet ;
         list.add("Delhi");
         list.add("Panjab");
         list.add("Bangalore");*/
+
+        BUS = new Bus(ThreadEnforcer.MAIN);
+
+        BUS.register(this);
 
        listimage.add(R.mipmap.n_img);
         listimage.add(R.mipmap.l_img);
@@ -135,15 +149,15 @@ private TextView site_check_internet ;
                 // When clicked, show a toast with the TextView text
 
                 positions = position;
-            namess = (String) list.get(position);
-              //  Toast.makeText(getApplicationContext(),
-                     //   ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
+                namess = (String) list.get(position);
+                //  Toast.makeText(getApplicationContext(),
+                //   ((TextView) view).getText(), Toast.LENGTH_SHORT).show();
                 custumDialog();
             }
         });
 
 
-
+    ;
 
 
         /** Defining a click event listener for the button "Add" */
@@ -184,8 +198,11 @@ private TextView site_check_internet ;
         /** Setting the adapter to the ListView */
         setListAdapter(adapter);
         ListViewHelper.getListViewSize(listView);
+
+
   ;
     }
+
 
 
     private void registerUserGet(String REGISTER_URL) {
@@ -204,11 +221,18 @@ private TextView site_check_internet ;
                             for(int i = 0; i<jsonArray.length();i++){
 
                                 JSONObject jsonObject1 = jsonArray.getJSONObject(i);
-                                 String sitename = jsonObject1.getString("vSiteName");
+                              sitename = jsonObject1.getString("vSiteName");
                                 list.add(sitename);
+
+                                dadaDaatses.add(new Daats(sitename));
+
+
+
 
                                 count ++;
                             }
+
+
 
                            Toast.makeText(getApplicationContext(),"No of records : "+count+"",Toast.LENGTH_LONG).show();
                             setListAdapter(adapter);
@@ -253,6 +277,11 @@ private TextView site_check_internet ;
 
     }
 
+    private  void sendRR(ArrayList<Daats> s){
+
+        BUS.post(s);
+    }
+
     public void custumDialog(){
        // custom dialog
 
@@ -280,12 +309,21 @@ private TextView site_check_internet ;
                 int fgfg = p;
                 Intent intent = new Intent(SiteInformationActivity.this,SurveyData.class);
                 intent.putExtra("name",name1);
-                intent.putExtra("pos",p);
+                intent.putExtra("pos", p);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+
+
+                        sendRR(dadaDaatses);
+                    }
+                });
 
                 startActivity(intent);
                 dialog.dismiss();
             }
         });
+
 
 
         upload.setOnClickListener(new View.OnClickListener() {
@@ -407,6 +445,7 @@ private TextView site_check_internet ;
 
 
 
+
         @Override
         public Object getItem(int position) {
             // TODO Auto-generated method stub
@@ -454,6 +493,10 @@ private TextView site_check_internet ;
         }
     }
 
-
+    @Override
+    protected void onPause() {
+        BUS.unregister(this);
+        super.onPause();
     }
+}
 

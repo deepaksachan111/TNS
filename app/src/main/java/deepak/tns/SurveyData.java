@@ -8,6 +8,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.squareup.otto.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +19,7 @@ public class SurveyData extends AppCompatActivity {
 
     List<Question> quesList  = new ArrayList<>();
 
-
+    String fsdff;
     //List<Question> questionList = new ArrayList<>();
 
     List<String> d = new ArrayList<>();
@@ -25,6 +28,10 @@ public class SurveyData extends AppCompatActivity {
     Question currentQ;
     TextView txtQuestion;
     RadioButton rda, rdb, rdc;
+TextView gfhfhf;
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +54,7 @@ public class SurveyData extends AppCompatActivity {
         });
 
         txtview.setText(name);
-
+      //  gfhfhf =(TextView)findViewById(R.id.textssss);
         currentQ=quesList.get(pos);
 
         txtQuestion=(TextView)findViewById(R.id.textView1);
@@ -56,6 +63,26 @@ public class SurveyData extends AppCompatActivity {
         rdc=(RadioButton)findViewById(R.id.radio2);
 
         setQuestionView();
+
+
+    }
+
+
+    @Override
+    protected void onResume() {
+
+        SiteInformationActivity.BUS.register(this);
+        super.onResume();
+    }
+
+    @Subscribe
+    public void hello(ArrayList<Daats> ss ){
+
+        for( Daats s : ss){
+            Toast.makeText(getApplicationContext(),s.getName(),Toast.LENGTH_SHORT).show();
+        }
+
+       // Toast.makeText(getApplicationContext(),s,Toast.LENGTH_LONG).show();
     }
 
     private void setQuestionView()
